@@ -9,3 +9,9 @@
     flex-direction: column;
     flex-grow: 1;
 }
+
+ul, ol{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
