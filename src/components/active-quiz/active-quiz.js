@@ -15,7 +15,7 @@ const ActiveQuiz = ({ answers,
       <p className={classes.Question}>
         <strong>1. {question}</strong>
         <small>
-          {activeQuestion} done from {quizLength} remains
+          {activeQuestion -1} done {quizLength -activeQuestion +1} remains
         </small>
       </p>
       <AnswerList
