@@ -5,6 +5,7 @@ import classes from './quiz.module.css'
 class Quiz extends Component {
   state = {
     activeQuestion: 0,
+    answerStatus: null,
     quiz: [
       {
         question: "How are you?",
@@ -24,19 +25,47 @@ class Quiz extends Component {
         answers: [
           { text: "Mike", id: 1 },
           { text: "Anna", id: 2 },
-          { text: "Vlad!", id: 3 },
-          { text: "Jama", id: 4 },
+          { text: "Vlad", id: 3 },
+          { text: "Tom", id: 4 },
         ],
       },
     ],
   };
   onAnswerClick = (answerId) => {
+    const { activeQuestion, quiz, answerStatus } = this.state;
+    const currentQuestion = quiz[activeQuestion];
+    if (answerStatus) {
+      const key = Object.keys(answerStatus)[0]
+      if(answerStatus[key] === 'error') {return}
+    }
+    if (answerId === currentQuestion.rightAnswerId) {
       this.setState({
-        activeQuestion: this.state.activeQuestion + 1
-    })
+        answerStatus: {[answerId]: 'success'}
+      })
+      const timeout = window.setTimeout(() => {
+        if (this.isQuizFinished(activeQuestion, quiz)) {
+          console.log("Well done buddy! You did it");
+        } else {
+          this.setState({
+            activeQuestion: activeQuestion + 1,
+            answerStatus: null
+          });
+        }
+        window.clearTimeout(timeout);
+      }, 1000);
+    } else {
+            this.setState({
+              answerStatus: { [answerId]: "error" },
+            });
+    }
+   
   };
+   isQuizFinished = (a, b) => {
+    return a + 1 === b.length
+  }
+
   render() {
-    const { quiz, activeQuestion } = this.state;
+    const { quiz, activeQuestion, answerStatus } = this.state;
     return (
       <div className={classes.Quiz}>
         <h1>Quiz</h1>
@@ -48,6 +77,7 @@ class Quiz extends Component {
             onAnswerClick={this.onAnswerClick}
             quizLength={quiz.length}
             activeQuestion={activeQuestion + 1}
+            answerStatus={answerStatus}
           />
         </div>
       </div>
