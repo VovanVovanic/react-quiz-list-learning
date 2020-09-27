@@ -1,4 +1,5 @@
 import React from 'react'
+import Button from '../../ui/buttons'
 import classes from './finished-quiz.module.css'
 
 const FinishedQuiz = ({ quiz, results, onRetry }) => {
@@ -24,9 +25,16 @@ const FinishedQuiz = ({ quiz, results, onRetry }) => {
       <div className={classes.FinishedQuiz}>
         <h2>Well done dude! You did it.</h2>
         <ul>{list}</ul>
-        <p>{correctAnswers} correct answers from {quiz.length}.</p>
+        <p>
+          {correctAnswers} correct answers from {quiz.length}.
+        </p>
         <div>
-          <button onClick={onRetry}>Retry</button>
+          <Button onClick={onRetry} type="primary">
+            Retry
+          </Button>
+          <Button type="success">
+            To quiz list
+          </Button>
         </div>
       </div>
     );
