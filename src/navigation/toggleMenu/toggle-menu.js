@@ -13,10 +13,14 @@ const ToggleMenu = ({ isOpen, onToggle }) => {
     else {
         cls.push('fa-bars')
         
-    }
+  }
+  
     return (
       <div>
-        <i className={cls.join(" ")} onClick={onToggle}></i>
+        <i
+          className={cls.join(" ")}
+          onClick={onToggle}
+        ></i>
       </div>
     );
 }
