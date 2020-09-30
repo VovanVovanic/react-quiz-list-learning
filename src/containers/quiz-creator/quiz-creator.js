@@ -40,8 +40,31 @@ class QuizCreator extends Component {
     isFormValid: false,
     formControls: this.createFormControls(),
   };
-  onAddQuestion = () => {};
-  onCreateQuiz = () => {};
+  onAddQuestion = (e) => {
+    e.preventDefault()
+    const quiz = this.state.quiz.concat()
+    const i = quiz.length + 1
+    const{question, option1, option2, option3, option4}=this.state.formControls
+    const questionItem = {
+      question: question.value,
+      id: i,
+      rightAnswerId: this.state.rightAnswerId,
+      answers: [
+        { text: option1.value, id: option1.id },
+        { text: option2.value, id: option2.id },
+        { text: option3.value, id: option3.id },
+        { text: option4.value, id: option4.id },
+      ],
+    };
+    quiz.push(questionItem);
+    this.setState({
+      quiz,
+      rightAnswerId: 1,
+      isFormValid: false,
+      formControls: this.createFormControls(),
+    });
+  };
+  onCreateQuiz = (e) => {};
   onInputChange = (e, control) => {
     const formControls = { ...this.state.formControls };
     const currentControl = { ...formControls[control] };
