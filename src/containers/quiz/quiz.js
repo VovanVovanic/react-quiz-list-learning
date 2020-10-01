@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import ActiveQuiz from '../../components/active-quiz'
 import FinishedQuiz from '../../components/finished-quiz'
+import Loader from '../../ui/loader'
+import ErrorMessage from '../../components/error-message'
+import axios from 'axios'
 import classes from './quiz.module.css'
 
 class Quiz extends Component {
@@ -9,31 +12,9 @@ class Quiz extends Component {
     isFinished: false,
     activeQuestion: 0,
     answerStatus: null,
-    quiz: [
-      {
-        question: "How are you?",
-        rightAnswerId: 1,
-        id: 1,
-        answers: [
-          { text: "I am fine", id: 1 },
-          { text: "I feel upset", id: 2 },
-          { text: "I am happy!", id: 3 },
-          { text: "Could be better", id: 4 },
-        ],
-      },
-      {
-        question: "What is your name?",
-        rightAnswerId: 3,
-        id: 2,
-        answers: [
-          { text: "Mike", id: 1 },
-          { text: "Anna", id: 2 },
-          { text: "Vlad", id: 3 },
-          { text: "Tom", id: 4 },
-        ],
-      },
-     
-    ],
+    error: '',
+    loading: true,
+    quiz: [],
   };
   onAnswerClick = (answerId) => {
     const { activeQuestion, quiz, answerStatus, results } = this.state;
@@ -86,6 +67,26 @@ class Quiz extends Component {
       answerStatus: null,
     });
   };
+  async componentDidMount() {
+    try {
+      const result = await axios.get(`https://react-quiz-df3e9.firebaseio.com/quzes/${this.props.match.params.id}.json`)
+      this.setState({
+        quiz: result.data,
+        results: {},
+        isFinished: false,
+        activeQuestion: 0,
+        answerStatus: null,
+        error: "",
+        loading: false,
+      });
+
+    } catch (e) {
+      this.setState({
+        error: `${e.response.status}  ${e.response.statusText}`,
+        loading: false
+      });
+    }
+  }
   render() {
     const {
       quiz,
@@ -93,31 +94,43 @@ class Quiz extends Component {
       answerStatus,
       isFinished,
       results,
+      loading, error
     } = this.state;
-    console.log(results);
+    console.log(this.state)
+    
+    const onContentLoad = () => {
+      let content
+      if (loading && !error) {
+        content = <Loader />;
+      }
+      else if (isFinished) {
+        content = (
+          <FinishedQuiz results={results} quiz={quiz} onRetry={this.onRetry} />
+        );
+      }  
+      else if (!isFinished && !error && !loading) {
+        content = (
+          <>
+            <h2>Answer all questions</h2>
+            <ActiveQuiz
+              answers={quiz[activeQuestion].answers}
+              question={quiz[activeQuestion].question}
+              onAnswerClick={this.onAnswerClick}
+              quizLength={quiz.length}
+              activeQuestion={activeQuestion + 1}
+              answerStatus={answerStatus}
+            />
+          </>
+        );
+      }else{content = <ErrorMessage message={error} />;}
+        
+        return content;
+    }
     return (
       <div className={classes.Quiz}>
         <h1>Quiz</h1>
         <div className={classes.QuizWrapper}>
-          {isFinished ? (
-            <FinishedQuiz
-              results={results}
-              quiz={quiz}
-              onRetry={this.onRetry}
-            />
-          ) : (
-            <>
-              <h2>Answer all questions</h2>
-              <ActiveQuiz
-                answers={quiz[activeQuestion].answers}
-                question={quiz[activeQuestion].question}
-                onAnswerClick={this.onAnswerClick}
-                quizLength={quiz.length}
-                activeQuestion={activeQuestion + 1}
-                answerStatus={answerStatus}
-              />
-            </>
-          )}
+          {onContentLoad()}
         </div>
       </div>
     );

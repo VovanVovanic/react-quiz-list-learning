@@ -2,12 +2,15 @@ import React, { Component } from "react";
 import Button from "../../ui/buttons";
 import Input from "../../ui/input";
 import Select from "../../ui/select";
+import ErrorMessage from '../../components/error-message'
 import {
   onCreateControls,
   onInputValid,
   validForm,
 } from "../../components/form/form-handlers";
+import axios from 'axios'
 import classes from "./quiz-creator.module.css";
+
 
 class QuizCreator extends Component {
   createControl = (num) => {
@@ -15,6 +18,7 @@ class QuizCreator extends Component {
       {
         label: `Add answer option № ${num}`,
         errorMsg: "Answer option must be here",
+        id: num
       },
       { required: true }
     );
@@ -36,19 +40,26 @@ class QuizCreator extends Component {
   };
   state = {
     quiz: [],
+    error: "",
     rightAnswerId: 1,
     isFormValid: false,
     formControls: this.createFormControls(),
   };
   onAddQuestion = (e) => {
-    e.preventDefault()
-    const quiz = this.state.quiz.concat()
-    const i = quiz.length + 1
-    const{question, option1, option2, option3, option4}=this.state.formControls
+    e.preventDefault();
+    const quiz = this.state.quiz.concat();
+    const i = quiz.length + 1;
+    const {
+      question,
+      option1,
+      option2,
+      option3,
+      option4,
+    } = this.state.formControls;
     const questionItem = {
       question: question.value,
       id: i,
-      rightAnswerId: this.state.rightAnswerId,
+      rightAnswerId: +this.state.rightAnswerId,
       answers: [
         { text: option1.value, id: option1.id },
         { text: option2.value, id: option2.id },
@@ -64,7 +75,26 @@ class QuizCreator extends Component {
       formControls: this.createFormControls(),
     });
   };
-  onCreateQuiz = (e) => {};
+  onCreateQuiz = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        "https://react-quiz-df3e9.firebaseio.com/quzes.json",
+        this.state.quiz
+      );
+      this.setState({
+        quiz: [],
+        error: "",
+        rightAnswerId: 1,
+        isFormValid: false,
+        formControls: this.createFormControls(),
+      });
+    } catch (e) {
+      this.setState({
+        error: `${e.response.status}  ${e.response.statusText}`,
+      });
+    }
+  };
   onInputChange = (e, control) => {
     const formControls = { ...this.state.formControls };
     const currentControl = { ...formControls[control] };
@@ -127,30 +157,33 @@ class QuizCreator extends Component {
           { text: 4, value: 4 },
         ]}
       />
-      );
-      console.log(this.state.isFormValid)
+    );
     return (
       <div className={classes.QuizCreator}>
         <div>
           <h2>Create Quiz</h2>
-          <form onSubmit={(e) => e.preventDefault()}>
-            {this.onCreateInputs()}
-            {select}
-            <Button
-              disabled={!this.state.isFormValid}
-              type="success"
-              onClick={this.onAddQuestion}
-            >
-              Add Question
-            </Button>
-            <Button
-              disabled={!this.state.quiz.length}
-              type="error"
-              onClick={this.onCreateQuiz}
-            >
-              Create New Quiz
-            </Button>
-          </form>
+          {this.state.error ? (
+            <ErrorMessage message={this.state.error} />
+          ) : (
+            <form onSubmit={(e) => e.preventDefault()}>
+              {this.onCreateInputs()}
+              {select}
+              <Button
+                disabled={!this.state.isFormValid}
+                type="success"
+                onClick={this.onAddQuestion}
+              >
+                Add Question
+              </Button>
+              <Button
+                disabled={!this.state.quiz.length || this.state.isFormValid}
+                type="error"
+                onClick={this.onCreateQuiz}
+              >
+                Create New Quiz
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     );

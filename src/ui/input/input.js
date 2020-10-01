@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './input.module.css'
 
-const Input = ({label, errorMsg, type, valid, touched, shouldValidate, onChange, placeholder }) => {
+const Input = ({label, errorMsg, type, valid, touched, shouldValidate, onChange, placeholder, value }) => {
     const cls = [
         classes.Input
     ]
@@ -18,6 +18,7 @@ const Input = ({label, errorMsg, type, valid, touched, shouldValidate, onChange,
         <input
           id={htmlFor}
           type={type}
+          value={value}
           placeholder={placeholder}
           valid={valid}
           touched={touched}
