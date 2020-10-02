@@ -81,9 +81,10 @@ class Quiz extends Component {
       });
 
     } catch (e) {
+      console.log(e.response);
       this.setState({
-        error: `${e.response.status}  ${e.response.statusText}`,
-        loading: false
+        error: `${e.response.data.error}`,
+        loading: false,
       });
     }
   }
@@ -96,7 +97,6 @@ class Quiz extends Component {
       results,
       loading, error
     } = this.state;
-    console.log(this.state)
     
     const onContentLoad = () => {
       let content

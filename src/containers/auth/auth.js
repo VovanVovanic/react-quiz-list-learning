@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
 import Button from '../../ui/buttons'
 import Input from '../../ui/input'
+import ErrorMessage from '../../components/error-message'
 import {
   onCreateControls,
   onInputValid,
   validForm,
 } from "../../components/form/form-handlers";
 import classes from './auth.module.css'
+import Axios from 'axios';
 
 class Auth extends Component {
   state = {
     isFormValid: false,
+    error: '',
     formControls: {
       email: onCreateControls({
         type: "email",
@@ -34,11 +37,39 @@ class Auth extends Component {
       }),
     },
   };
-  onLogin = () => {
-    console.log("ok");
+  onError = (event) => {
+          this.setState({
+            error: `${event.response.data.error.message}`,
+          });
+  }
+  onAuthData = () => ({
+    email: this.state.formControls.email.value,
+    password: this.state.formControls.password.value,
+    returnSecureToken: true,
+  });
+  onLogin = async () => {
+    try {
+      const result = await Axios.post(
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA7pT-0dwEZlhLYnbTSKq2oPRu37hovKwQ",
+        this.onAuthData()
+      );
+      console.log(result);
+    } catch (e) {
+
+    this.onError(e)
+    }
   };
-  onRegister = () => {
-    console.log("okok");
+
+  onRegister = async () => {
+    try {
+      const result = await Axios.post(
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyA7pT-0dwEZlhLYnbTSKq2oPRu37hovKwQ",
+        this.onAuthData()
+      );
+      console.log(result);
+    } catch (e) {
+      this.onError(e);
+    }
   };
 
   onInputChange = (e, control) => {
@@ -91,26 +122,31 @@ class Auth extends Component {
       <div className={classes.Auth}>
         <div>
           <h2>Authorization</h2>
-          <form
-            className={classes.AuthForm}
-            onSubmit={(e) => e.preventDefault()}
-          >
-            {this.onInputsRender()}
-            <Button
-              disabled={!this.state.isFormValid}
-              onClick={this.onLogin}
-              type="success"
+
+          {this.state.error ? (
+            <ErrorMessage message={this.state.error} />
+          ) : (
+            <form
+              className={classes.AuthForm}
+              onSubmit={(e) => e.preventDefault()}
             >
-              Log In
-            </Button>
-            <Button
-              disabled={!this.state.isFormValid}
-              onClick={this.onRegister}
-              type="primary"
-            >
-              Register
-            </Button>
-          </form>
+              {this.onInputsRender()}
+              <Button
+                disabled={!this.state.isFormValid}
+                onClick={this.onLogin}
+                type="success"
+              >
+                Log In
+              </Button>
+              <Button
+                disabled={!this.state.isFormValid}
+                onClick={this.onRegister}
+                type="primary"
+              >
+                Register
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     );
