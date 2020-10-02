@@ -5,7 +5,7 @@ const ErrorMessage = ({ message }) => {
     return (
       <div className={classes.ErrorMessage}>
         <div>
-          <h2>{`Something is wrong. Error code: ${message}`}</h2>
+          <h2>{`An error appeared. Error message: ${message.toUpperCase()}`}</h2>
         </div>
       </div>
     );
