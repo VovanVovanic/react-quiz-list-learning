@@ -6,3 +6,6 @@ export const ANSWER_STATUS = "ANSWER_STATUS";
 export const FINISHED_QUIZ = "FINISHED_QUIZ";
 export const CHANGE_QUESTION = "CHANGE_QUESTION";
 export const RETRY_QUIZ = "RETRY_QUIZ";
+export const ADD_QUIZ_ITEM = "ADD_QUIZ_ITEM";
+export const ON_QUIZ_CREATED = "ON_QUIZ_CREATED";
+export const ON_ERROR = "ON_ERROR";

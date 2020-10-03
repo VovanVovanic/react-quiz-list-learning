@@ -2,15 +2,15 @@ import React, { Component } from "react";
 import Button from "../../ui/buttons";
 import Input from "../../ui/input";
 import Select from "../../ui/select";
-import ErrorMessage from '../../components/error-message'
+import ErrorMessage from "../../components/error-message";
 import {
   onCreateControls,
   onInputValid,
   validForm,
 } from "../../components/form/form-handlers";
-import axios from 'axios'
+import { connect } from "react-redux";
+import { addQuizItem, createQuiz } from "../../store/actions/create ";
 import classes from "./quiz-creator.module.css";
-
 
 class QuizCreator extends Component {
   createControl = (num) => {
@@ -18,7 +18,7 @@ class QuizCreator extends Component {
       {
         label: `Add answer option № ${num}`,
         errorMsg: "Answer option must be here",
-        id: num
+        id: num,
       },
       { required: true }
     );
@@ -39,16 +39,12 @@ class QuizCreator extends Component {
     };
   };
   state = {
-    quiz: [],
-    error: "",
     rightAnswerId: 1,
     isFormValid: false,
     formControls: this.createFormControls(),
   };
   onAddQuestion = (e) => {
     e.preventDefault();
-    const quiz = this.state.quiz.concat();
-    const i = quiz.length + 1;
     const {
       question,
       option1,
@@ -58,7 +54,7 @@ class QuizCreator extends Component {
     } = this.state.formControls;
     const questionItem = {
       question: question.value,
-      id: i,
+      id: this.props.quiz.length + 1,
       rightAnswerId: +this.state.rightAnswerId,
       answers: [
         { text: option1.value, id: option1.id },
@@ -67,33 +63,21 @@ class QuizCreator extends Component {
         { text: option4.value, id: option4.id },
       ],
     };
-    quiz.push(questionItem);
+    this.props.addQuizItem(questionItem);
     this.setState({
-      quiz,
       rightAnswerId: 1,
       isFormValid: false,
       formControls: this.createFormControls(),
     });
   };
-  onCreateQuiz = async (e) => {
+  onCreateQuiz = (e) => {
     e.preventDefault();
-    try {
-      await axios.post(
-        "https://react-quiz-df3e9.firebaseio.com/quzes.json",
-        this.state.quiz
-      );
-      this.setState({
-        quiz: [],
-        error: "",
-        rightAnswerId: 1,
-        isFormValid: false,
-        formControls: this.createFormControls(),
-      });
-    } catch (e) {
-      this.setState({
-        error: `${e.response.status}  ${e.response.statusText}`,
-      });
-    }
+    this.props.createQuiz();
+    this.setState({
+      rightAnswerId: 1,
+      isFormValid: false,
+      formControls: this.createFormControls(),
+    });
   };
   onInputChange = (e, control) => {
     const formControls = { ...this.state.formControls };
@@ -162,8 +146,8 @@ class QuizCreator extends Component {
       <div className={classes.QuizCreator}>
         <div>
           <h2>Create Quiz</h2>
-          {this.state.error ? (
-            <ErrorMessage message={this.state.error} />
+          {this.props.error ? (
+            <ErrorMessage message={this.props.error} />
           ) : (
             <form onSubmit={(e) => e.preventDefault()}>
               {this.onCreateInputs()}
@@ -176,7 +160,7 @@ class QuizCreator extends Component {
                 Add Question
               </Button>
               <Button
-                disabled={!this.state.quiz.length || this.state.isFormValid}
+                disabled={!this.props.quiz.length || this.state.isFormValid}
                 type="error"
                 onClick={this.onCreateQuiz}
               >
@@ -190,4 +174,16 @@ class QuizCreator extends Component {
   }
 }
 
-export default QuizCreator;
+function mapStateToProps(state) {
+  return {
+    quiz: state.create.quiz,
+    error: state.create.error,
+  };
+}
+function mapDispatchToProps(dispatch) {
+  return {
+    addQuizItem: (item) => dispatch(addQuizItem(item)),
+    createQuiz: () => dispatch(createQuiz()),
+  };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(QuizCreator);
