@@ -27,7 +27,10 @@ class Quiz extends Component {
     
     const onContentLoad = () => {
       let content
-      if (loading && !error || !quiz.length) {
+      if (loading && !error) {
+        content = <Loader />;
+      }
+      else if(!quiz.length) {
         content = <Loader />;
       }
       else if (isFinished) {

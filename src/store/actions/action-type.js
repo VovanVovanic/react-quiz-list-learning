@@ -9,3 +9,5 @@ export const RETRY_QUIZ = "RETRY_QUIZ";
 export const ADD_QUIZ_ITEM = "ADD_QUIZ_ITEM";
 export const ON_QUIZ_CREATED = "ON_QUIZ_CREATED";
 export const ON_ERROR = "ON_ERROR";
+export const ON_TOKEN_SET = "ON_TOKEN_SET";
+export const ON_SESSION_EXPIRED = "ON_SESSION_EXPIRED";

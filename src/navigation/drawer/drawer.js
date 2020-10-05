@@ -1,31 +1,38 @@
 
 import React, {Component} from "react";
 import BackDrop from '../back-drop'
-import {NavLink} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import classes from "./drawer.module.css";
 
 class Drawer extends Component {
-  links = [
-    { to: "/", label: "Quiz List", exact: true },
-    { to: "/auth", label: "Authentication", exact: false },
-    { to: "/quiz-creator", label: "Quiz Creator", exact: false },
-  ];
-     list = this.links.map(({to, label, exact}, i) => {
+  render() {
+    const { isOpen, onMenuClose, isAuthorized } = this.props;
+    const  links = [
+        { to: "/", label: "Quiz List", exact: true },
+        
+        
+    ];
+    if (isAuthorized) {
+      links.push({ to: "/quiz-creator", label: "Quiz Creator", exact: false });
+      links.push({ to: "/logout", label: "Logout", exact: false });
+    }
+    else {
+      links.push({ to: "/auth", label: "Authentication", exact: false });
+    }
+    const  list = links.map(({ to, label, exact }, i) => {
         return (
           <li key={i}>
             <NavLink
               to={to}
               exact={exact}
-              onClick={()=>this.props.onMenuClose()}
-            activeClassName={classes.active}>
-              {label}.</NavLink>
+              onClick={() => this.props.onMenuClose()}
+              activeClassName={classes.active}
+            >
+              {label}.
+            </NavLink>
           </li>
         );
-    })
-
-
-  render() {
-    const { isOpen, onMenuClose } = this.props
+      });
     
         const cls = [
         classes.Drawer
@@ -36,11 +43,12 @@ class Drawer extends Component {
     return (
       <>
       <nav className={cls.join(' ')}>
-        <ul>{this.list}</ul>
+        <ul>{list}</ul>
           </nav>
           {isOpen ? <BackDrop onClick={onMenuClose} /> : null}
     </>
     )
   }
 }
+
 export default Drawer;

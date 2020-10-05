@@ -20,7 +20,11 @@ class Layout extends Component {
   render() {
     return (
       <div className={classes.Layout}>
-        <Drawer isOpen={this.state.menu} onMenuClose={this.onMenuClose}/>
+        <Drawer
+          isOpen={this.state.menu}
+          onMenuClose={this.onMenuClose}
+          isAuthorized={this.props.isAuthorized}
+        />
         <ToggleMenu isOpen={this.state.menu} onToggle={this.onToggle} />
         <main>{this.props.children}</main>
       </div>

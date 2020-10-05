@@ -8,13 +8,12 @@ import {
   validForm,
 } from "../../components/form/form-handlers";
 import classes from './auth.module.css'
-import Axios from 'axios';
+import { connect } from 'react-redux'
+import {auth} from '../../store/actions/auth'
 
 class Auth extends Component {
-  state = {
-    isFormValid: false,
-    error: '',
-    formControls: {
+  createFormControls() {
+    return {
       email: onCreateControls({
         type: "email",
         label: "Email",
@@ -35,41 +34,35 @@ class Auth extends Component {
           minLength: 6,
         },
       }),
-    },
-  };
-  onError = (event) => {
-          this.setState({
-            error: `${event.response.data.error.message}`,
-          });
+    }
   }
-  onAuthData = () => ({
-    email: this.state.formControls.email.value,
-    password: this.state.formControls.password.value,
-    returnSecureToken: true,
-  });
-  onLogin = async () => {
-    try {
-      const result = await Axios.post(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA7pT-0dwEZlhLYnbTSKq2oPRu37hovKwQ",
-        this.onAuthData()
-      );
-      console.log(result);
-    } catch (e) {
-
-    this.onError(e)
-    }
+  state = {
+    isFormValid: false,
+    formControls: this.createFormControls()
+  };
+ 
+  onLogin = () => {
+    this.props.auth(
+      this.state.formControls.email.value,
+      this.state.formControls.password.value,
+      true
+    )
+    this.setState({
+      isFormValid: false,
+      formControls: this.createFormControls(),
+    });
   };
 
-  onRegister = async () => {
-    try {
-      const result = await Axios.post(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyA7pT-0dwEZlhLYnbTSKq2oPRu37hovKwQ",
-        this.onAuthData()
-      );
-      console.log(result);
-    } catch (e) {
-      this.onError(e);
-    }
+  onRegister = () => {
+      this.props.auth(
+      this.state.formControls.email.value,
+      this.state.formControls.password.value,
+      false
+    )
+    this.setState({
+      isFormValid: false,
+      formControls: this.createFormControls(),
+    });
   };
 
   onInputChange = (e, control) => {
@@ -122,9 +115,10 @@ class Auth extends Component {
       <div className={classes.Auth}>
         <div>
           <h2>Authorization</h2>
+          <h4>(email: test@test.com, password: 123456, or make your own registration)</h4>
 
-          {this.state.error ? (
-            <ErrorMessage message={this.state.error} />
+          {this.props.error ? (
+            <ErrorMessage message={this.props.error} />
           ) : (
             <form
               className={classes.AuthForm}
@@ -152,5 +146,14 @@ class Auth extends Component {
     );
   }
 }
-
-export default Auth
+function mapStateToProps(state) {
+  return {
+    error: state.auth.error
+  }
+}
+function mapDispatchToProps(dispatch) {
+  return {
+    auth: (email, password, isLoggedIn) => dispatch(auth(email, password, isLoggedIn))
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Auth)
