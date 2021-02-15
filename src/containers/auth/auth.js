@@ -115,7 +115,7 @@ class Auth extends Component {
       <div className={classes.Auth}>
         <div>
           <h2>Authorization</h2>
-          <h4>(email: test@test.com, password: 123456, or make your own registration)</h4>
+          <h4>(email: test2@test.com, password: 123456, or make your own registration)</h4>
 
           {this.props.error ? (
             <ErrorMessage message={this.props.error} />

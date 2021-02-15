@@ -31,7 +31,6 @@ export function auth(email, password, isLoggedIn) {
       dispatch(onTokenSet(data.idToken));
       dispatch(onSessionExpired(data.expiresIn));
     } catch (e) {
-      console.log(e.response.data.error.message);
       const error = e.response.data.error.message;
       dispatch(getError(error));
     }
@@ -83,3 +82,5 @@ export function logout() {
     type: ON_SESSION_EXPIRED,
   };
 }
+
+console.log(new Date(1702584640000));
